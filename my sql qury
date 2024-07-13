@@ -1,0 +1,25 @@
+CREATE DATABASE school_management;
+USE school_management;
+
+-- Create users table for login credentials
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Create user_details table for additional user information
+CREATE TABLE user_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    address TEXT,
+    national_id VARCHAR(50),
+    gender ENUM('male', 'female', 'other'),
+    roles VARCHAR(50),
+    state VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

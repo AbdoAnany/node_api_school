@@ -48,7 +48,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
- 
+
 // Update User
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
