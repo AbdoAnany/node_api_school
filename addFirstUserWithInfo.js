@@ -56,18 +56,18 @@ const addFirstUserWithInfo = async () => {
     }
 };
 const addhInfo = async () => {
-    const username = 'admin2';
+    const username = 'admin44';
     const password = 'password123';
     const userDetails = {
-        first_name: 'Admin1',
-        last_name: 'User',
-        email: 'admin1@example.com',
-        phone: '1234567890',
-        address: '123 Admin2 St, Admin City, Admin State',
+        first_name: 'Ali',
+        last_name: 'Omar',
+        email: 'Ali@example.com',
+        phone: '01115485741544',
+        address: '123 Ali St, Admin City, Admin State',
         national_id: 'A12345678',
-        gender: 'female',
+        gender: 'male',
         roles: 'student',
-        state: 'active'
+        state: 'not active'
     };
 
     try {
