@@ -12,6 +12,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const analyzeRoutes = require('./routes/analyzeRoutes');
 const cors = require('cors');
 const app = express();
 
@@ -33,7 +34,7 @@ app.get('/api/data', (req, res) => {
 app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/analyzes', analyzeRoutes);
 const PORT = process.env.PORT || 3000;
 // // Error handling middleware
 app.use((err, req, res, next) => {
