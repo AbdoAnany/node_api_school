@@ -1,89 +1,106 @@
 // routes/attendance.js
 const express = require('express');
-const router = express.Router();
-const pool = require('../db');
+const attendanceRoutes = express.Router();
+const db = require('../config/db');
 
-// Insert Attendance
-router.post('/', async (req, res) => {
-    const { student_id, class_id, date, status } = req.body;
-    try {
-        const newAttendance = await pool.query(
-            "INSERT INTO attendance (student_id, class_id, date, status) VALUES ($1, $2, $3, $4) RETURNING *",
-            [student_id, class_id, date, status]
-        );
-        res.json(newAttendance.rows[0]);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+// Get all attendance records
+attendanceRoutes.get('/', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM attendance');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Delete Attendance
-router.delete('/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        await pool.query("DELETE FROM attendance WHERE attendance_id = $1", [id]);
-        res.json({ message: "Attendance deleted" });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+// Get attendance record by ID
+attendanceRoutes.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query('SELECT * FROM attendance WHERE attendance_id = ?', [id]);
+    if (rows.length > 0) {
+      res.json(rows[0]);
+    } else {
+      res.status(404).json({ error: 'Attendance record not found' });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Update Attendance
-router.put('/:id', async (req, res) => {
-    const { id } = req.params;
-    const { student_id, class_id, date, status } = req.body;
-    try {
-        const updatedAttendance = await pool.query(
-            "UPDATE attendance SET student_id = $1, class_id = $2, date = $3, status = $4 WHERE attendance_id = $5 RETURNING *",
-            [student_id, class_id, date, status, id]
-        );
-        res.json(updatedAttendance.rows[0]);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+// Create a new attendance record
+attendanceRoutes.post('/', async (req, res) => {
+  const { user_detail_id, date, status, remarks } = req.body;
+  try {
+    const [result] = await db.query(
+      'INSERT INTO attendance (user_detail_id, date, status, remarks) VALUES (?, ?, ?, ?)',
+      [user_detail_id, date, status, remarks]
+    );
+    res.status(201).json({ attendance_id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Get All Attendance Records
-router.get('/', async (req, res) => {
-    try {
-        const allAttendance = await pool.query("SELECT * FROM attendance");
-        res.json(allAttendance.rows);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+// Update an attendance record
+attendanceRoutes.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_detail_id, date, status, remarks } = req.body;
+  try {
+    const [result] = await db.query(
+      'UPDATE attendance SET user_detail_id = ?, date = ?, status = ?, remarks = ? WHERE attendance_id = ?',
+      [user_detail_id, date, status, remarks, id]
+    );
+    if (result.affectedRows > 0) {
+      res.json({ message: 'Attendance record updated' });
+    } else {
+      res.status(404).json({ error: 'Attendance record not found' });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Get Attendance by ID
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const attendance = await pool.query("SELECT * FROM attendance WHERE attendance_id = $1", [id]);
-        res.json(attendance.rows[0]);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+// Delete an attendance record
+attendanceRoutes.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await db.query('DELETE FROM attendance WHERE attendance_id = ?', [id]);
+    if (result.affectedRows > 0) {
+      res.json({ message: 'Attendance record deleted' });
+    } else {
+      res.status(404).json({ error: 'Attendance record not found' });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-router.get('/attendanceByDate/:date', async (req, res) => {
-    const { date } = req.params;
+// Create a new attendance record for a specific user_detail_id
+attendanceRoutes.post('/:user_detail_id', async (req, res) => {
+    const { user_detail_id } = req.params;
+    const { date, status, remarks } = req.body;
     try {
-        const attendanceRecords = await pool.query(
-            `SELECT u.username, r.role_name, a.state AS attendance_state, c.class_name
-             FROM attendance a
-             JOIN users u ON a.user_id = u.id
-             JOIN roles r ON u.role_id = r.id
-             LEFT JOIN classes c ON a.class_id = c.id
-             WHERE a.date = $1`,
-            [date]
-        );
-        res.json(attendanceRecords.rows);
+      const [result] = await db.query(
+        'INSERT INTO attendance (user_detail_id, date, status, remarks) VALUES (?, ?, ?, ?)',
+        [user_detail_id, date, status, remarks]
+      );
+      res.status(201).json({ attendance_id: result.insertId });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: err.message });
     }
-});
-module.exports = router;
+  });
+// Get all attendance records by user_detail_id
+attendanceRoutes.get('/user/:user_detail_id', async (req, res) => {
+    const { user_detail_id } = req.params;
+    try {
+      const [rows] = await db.query('SELECT * FROM attendance WHERE user_detail_id = ?', [user_detail_id]);
+      if (rows.length > 0) {
+        res.json(rows);
+      } else {
+        res.status(404).json({ error: 'No attendance records found for this user' });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }});
+
+module.exports = attendanceRoutes;

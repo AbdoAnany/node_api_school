@@ -56,18 +56,18 @@ const addFirstUserWithInfo = async () => {
     }
 };
 const addhInfo = async () => {
-    const username = 'admin44';
-    const password = 'password123';
+    const username = 'admin';
+    const password = 'password';
     const userDetails = {
-        first_name: 'Ali',
-        last_name: 'Omar',
-        email: 'Ali@example.com',
+        first_name: 'Mai',
+        last_name: 'Kaled',
+        email: 'Mai@example.com',
         phone: '01115485741544',
-        address: '123 Ali St, Admin City, Admin State',
+        address: '123 Mai St, Admin City, Admin State',
         national_id: 'A12345678',
-        gender: 'male',
+        gender: 'female',
         roles: 'student',
-        state: 'not active'
+        state: 'active'
     };
 
     try {
@@ -83,7 +83,7 @@ const addhInfo = async () => {
             const [existingUsersD] = await db.execute('SELECT * FROM user_details WHERE user_id = ?', [userId]);
             if (existingUsersD.length == 0) {
             await db.execute(
-                'INSERT INTO user_details (user_id, first_name, last_name, email, phone, address, national_id, gender, roles, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO user_details (user_id, first_name, last_name, email, phone, address, national_id, gender, roles, state,birth_date) VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     userId,
                     userDetails.first_name,
@@ -94,14 +94,15 @@ const addhInfo = async () => {
                     userDetails.national_id,
                     userDetails.gender,
                     userDetails.roles,
-                    userDetails.state
+                    userDetails.state,
+                    userDetails.birth_date  
                 ].map(val => (val !== undefined ? val : null)) // Replace undefined with null
             );
         } else if (existingUsersD.length > 0) {
         
-                await db.execute('UPDATE user_details SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, national_id = ?, gender = ?, roles = ?, state = ? WHERE user_id = ?', 
+                await db.execute('UPDATE user_details SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, national_id = ?, gender = ?, roles = ?,birth_date = ?,  state = ? WHERE user_id = ?', 
                     [  userDetails.first_name,  userDetails.last_name,   userDetails.email,  
-                         userDetails.phone,   userDetails.address,   userDetails.national_id,   userDetails.gender,  userDetails.roles,   userDetails.state, userId]
+                         userDetails.phone,   userDetails.address,   userDetails.national_id,   userDetails.gender,  userDetails.roles,                    userDetails.birth_date   ,  userDetails.state, userId]
                     .map(val => 
                         (val !== undefined ? val : null)) // Replace undefined with null
             );

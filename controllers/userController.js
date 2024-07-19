@@ -2,12 +2,12 @@ const db = require('../config/db');
 
 // Create (Add) personal info
 exports.addPersonalInfo = async (req, res) => {
-    const { first_name, last_name, email, phone, address, national_id, gender, roles, state } = req.body;
+    const { first_name, last_name, email, phone, address, national_id, gender, roles, state ,birth_date} = req.body;
     const userId = req.userId;
 
     try {
-        await db.execute('INSERT INTO user_details (user_id, first_name, last_name, email, phone, address, national_id, gender, roles, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-            [userId, first_name, last_name, email, phone, address, national_id, gender, roles, state]);
+        await db.execute('INSERT INTO user_details (user_id, first_name, last_name, email, phone, address, national_id, gender, roles, state,birth_date) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', 
+            [userId, first_name, last_name, email, phone, address, national_id, gender, roles, state,birth_date]);
         res.status(200).json({ message: 'Personal info added!' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -43,12 +43,12 @@ exports.getAllPersonalInfo = async (req, res) => {
 
 // Update personal info
 exports.updatePersonalInfo = async (req, res) => {
-    const { first_name, last_name, email, phone, address, national_id, gender, roles, state } = req.body;
+    const { first_name, last_name, email, phone, address, national_id, gender, roles, state ,birth_date} = req.body;
     const userId = req.userId;
 
-    try {
-        await db.execute('UPDATE user_details SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, national_id = ?, gender = ?, roles = ?, state = ? WHERE user_id = ?', 
-            [first_name, last_name, email, phone, address, national_id, gender, roles, state, userId]);
+    try {                  
+        await db.execute('UPDATE user_details SET first_name = ?, last_name = ?, email = ?, phone = ?, address = ?, national_id = ?, gender = ?, roles = ?,birth_date  = ?, state = ? WHERE user_id = ?', 
+            [first_name, last_name, email, phone, address, national_id, gender, roles,birth_date, state, userId]);
         res.status(200).json({ message: 'Personal info updated!' });
     } catch (error) {
         res.status(500).json({ error: error.message });
